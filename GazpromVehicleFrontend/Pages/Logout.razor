@@ -1,0 +1,12 @@
+﻿@page "/logout"
+@using GazpromVehicleFrontend.Services.Auth
+@inject NavigationManager NavManager
+@inject IJwtAuthService AuthService
+
+@code {
+	protected override async Task OnInitializedAsync()
+	{
+		await AuthService.LogOut();
+		NavManager.NavigateTo("/");
+	}
+}

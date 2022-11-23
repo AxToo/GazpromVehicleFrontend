@@ -1,0 +1,12 @@
+﻿@inject NavigationManager Navigation
+
+@code {
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        Navigation.NavigateTo("/Login", true);
+
+        await base.SetParametersAsync(parameters);
+    }
+}
+

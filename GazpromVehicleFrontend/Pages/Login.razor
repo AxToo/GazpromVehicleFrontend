@@ -1,0 +1,14 @@
+﻿@page "/Login"
+@layout LoginLayout
+
+
+
+<MudText Typo="Typo.h4" GutterBottom="true">Авторизация</MudText>
+
+<MudTextField T="string" @bind-Value="Model.UserName" Label="E-mail" Variant="Variant.Filled" Class="my-6"></MudTextField>
+
+<MudTextField @bind-Value="Model.Password" Label="Password" Variant="Variant.Filled" InputType="@passwordInput" Adornment="Adornment.End" />
+
+<MudDivider Class="mb-4" />
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OnValidSubmit" Size="Size.Large" FullWidth="true">Войти</MudButton>
