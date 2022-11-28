@@ -1,0 +1,52 @@
+﻿@page "/Vehicles"
+@attribute [Authorize(Roles = "Admin")]
+
+
+<MudStack Justify="Justify.Center" AlignItems="AlignItems.Stretch" Spacing="2">
+    <MudTable Items="VehiclesDto" Hover="true" Dense="true">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Транспорт</MudText>
+            <MudIconButton Icon="@Icons.Material.Filled.AddCircle" 
+                           Color="Color.Inherit" 
+                           Edge="Edge.End"
+                           OnClick="@( async () => await AddVehicle())"/>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Модель</MudTh>
+            <MudTh>Гос. Номер</MudTh>
+            <MudTh>Статус проверки</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Модель">@context.Brand</MudTd>
+            <MudTd DataLabel="Гос. Номер">@context.RegistrationNumber</MudTd>
+            <MudTd DataLabel="Статус проверки">
+                <MudChip Color="@(context.IsChecked ? Color.Success : Color.Warning)">
+                    @(context.IsChecked ? "Проверенно" : "Не проверенно")
+                </MudChip>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudStack>
+
+@code
+{
+    [Inject] private HttpClient Client { get; set; }
+    [Inject] private IDialogService DialogService { get; set; }
+
+    private List<VehicleDto> VehiclesDto { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAllVehicles();
+    }
+
+    private async Task AddVehicle()
+    {
+        var dialog = await DialogService.ShowAsync<VehicleDialog>("Добавить транспорт");
+        var result = await dialog.Result;
+
+        await GetAllVehicles();
+    }
+
+    private async Task GetAllVehicles() => VehiclesDto = await Client.GetFromJsonAsync<List<VehicleDto>>("/api/vehicles");
+}

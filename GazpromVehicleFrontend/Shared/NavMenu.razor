@@ -3,12 +3,13 @@
     <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard">Home</MudNavLink>
 
     <MudNavGroup Title="Меню" Icon="@Icons.Material.Outlined.MonetizationOn" Expanded="false">
-        <MudNavLink Href="vehicle" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.ForkRight">Транспорт</MudNavLink>
+        <MudNavLink Href="checkouts" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.ForkRight">Проверки</MudNavLink>
     </MudNavGroup>
     @if (IsAdmin)
     {
         <MudNavGroup Title="Управление" Icon="@Icons.Material.Outlined.AdminPanelSettings" Expanded="false">
             <MudNavLink Href="admin/users" Icon="@Icons.Material.Outlined.ManageAccounts">Пользователи</MudNavLink>
+            <MudNavLink Href="vehicles" Icon="@Icons.Material.Outlined.ManageAccounts">Траснпорт</MudNavLink>
         </MudNavGroup>
     }
 </MudNavMenu>

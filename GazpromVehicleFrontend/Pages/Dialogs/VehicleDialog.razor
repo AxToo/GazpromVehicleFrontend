@@ -1,0 +1,52 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudTextField T="string" 
+                      Label="Модель" 
+                      Required="true" 
+                      RequiredError="Обязательное поле!"
+                      Variant="Variant.Filled"
+                      @bind-Value="Brand"/>
+        <MudTextField T="string" 
+                      Label="Гос. Номер" 
+                      Required="true" 
+                      RequiredError="Обязательное поле!"
+                      Mask="@(new PatternMask("*000**00"))"
+                      Variant="Variant.Filled"
+                      @bind-Value="RegistrationNumber"/>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@( async () => await Add())">
+            Добавить
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Inject]
+    HttpClient Client { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
+    private string Brand { get; set; }
+    private string RegistrationNumber { get; set; }
+
+    private void Cancel()
+    {
+        MudDialog.Close();
+    }
+
+    private async Task Add()
+    {
+        var body = new AddVehicleRequest { Brand = Brand, RegistrationNumber = RegistrationNumber};
+        var request = await Client.PostAsJsonAsync("api/vehicles/add", body);
+        
+        Snackbar.Add($"Транспорт с гос.номером {RegistrationNumber} успешно добавлен!", Severity.Success);
+        MudDialog.Close();
+    }   
+
+}
