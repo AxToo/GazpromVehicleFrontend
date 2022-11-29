@@ -1,4 +1,6 @@
 ﻿@page "/Vehicles"
+@using System.Text
+@using System.Text.Json
 @attribute [Authorize(Roles = "Admin")]
 
 
@@ -15,6 +17,7 @@
             <MudTh>Модель</MudTh>
             <MudTh>Гос. Номер</MudTh>
             <MudTh>Статус проверки</MudTh>
+            <MudTh></MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Модель">@context.Brand</MudTd>
@@ -24,6 +27,9 @@
                     @(context.IsChecked ? "Проверенно" : "Не проверенно")
                 </MudChip>
             </MudTd>
+            <MudTd>
+                <MudIconButton Color="Color.Error" Icon="@Icons.Filled.DeleteForever" Size="Size.Small" OnClick="@( async () => await RemoveVehicle(context.RegistrationNumber))"/>
+            </MudTd>
         </RowTemplate>
     </MudTable>
 </MudStack>
@@ -32,6 +38,7 @@
 {
     [Inject] private HttpClient Client { get; set; }
     [Inject] private IDialogService DialogService { get; set; }
+    [Inject]private ISnackbar Snackbar { get; set; }
 
     private List<VehicleDto> VehiclesDto { get; set; } = new();
 
@@ -46,6 +53,41 @@
         var result = await dialog.Result;
 
         await GetAllVehicles();
+    }
+
+    private async Task RemoveVehicle(string regNumber)
+    {
+        var body = new RemoveVehicleRequest
+        {
+            RegNumber = regNumber
+        };
+        var request = new HttpRequestMessage
+        {
+            Content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json"),
+            Method = HttpMethod.Delete,
+            RequestUri = new Uri("/api/vehicles/removeByRegNumber", UriKind.Relative)
+        };
+
+        var dialogResult = await DialogService.ShowMessageBox("Warning",
+            $"Удалить транспортное средство {regNumber}?",
+            yesText: "Удалить", cancelText: "Отмена");
+
+        if (dialogResult != null)
+        {
+            var result = await Client.SendAsync(request);
+
+            var message = result.IsSuccessStatusCode
+                ? $"Транспорт с гос.номером {regNumber} успешно удален"
+                : result.ReasonPhrase;
+
+            var severity = result.IsSuccessStatusCode ? Severity.Success : Severity.Error;
+
+            Snackbar.Add(message, severity);
+
+            await GetAllVehicles();
+        }
+        
+        StateHasChanged();
     }
 
     private async Task GetAllVehicles() => VehiclesDto = await Client.GetFromJsonAsync<List<VehicleDto>>("/api/vehicles");
